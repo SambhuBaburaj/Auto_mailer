@@ -1,0 +1,16 @@
+{
+  "name": "job-application-mailer",
+  "version": "1.0.0",
+  "description": "Bulk personalized job application email sender with resume attachment.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dry-run": "node src/send-mails.js --dry-run",
+    "send": "node src/send-mails.js --send",
+    "start": "node src/send-mails.js --dry-run"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "nodemailer": "^9.0.3"
+  }
+}
