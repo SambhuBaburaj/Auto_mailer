@@ -1,5 +1,10 @@
 enabled,companyName,email,role,subject
-false,Frontend Example,frontend@example.com,front,
-true,Backend Example,sambhubaburaj007@gmail.com,back,
-true,Full Stack Example,sambhubaburaj007@gmail.com,full,
-true,Addai Tools,sambhubaburaj007@gmail.com,back
+true,Reflections Info Systems (P) Ltd,Careers@reflectionsinfos.com,full,
+true,Enfin Technologies India (P) Ltd,hr@enfintechnologies.com,full,Fullstack Developer
+true,Lean Transitions Solutions,careers@ltslean.com,full,Full Stack Developer - NodeJS & ReactJS
+true,Movytech Innovations (P) Ltd,hr@movytech.co,front,
+true,Mantra IT Solutions,hr@mantraitsolutions.in,full,Application for Full Stack Developer – Kochi
+true,Ynot Infosolutions,hr@ynotinfo.com,back,Laravel Developer Application
+true,Techversant Infotech Pvt Ltd,careers@techversantinfotech.com,back,
+true,Global Infonet Inc,hr@global-infonet.com,full,
+true,TouchWorld Technology,hrteam@touchworldtechnology.com,full,

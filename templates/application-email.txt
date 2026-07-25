@@ -4,8 +4,6 @@ I hope you are doing well.
 
 I am writing to express my interest in the {{roleTitle}} position at {{companyName}}. {{roleFocusParagraph}}
 
-{{highlightedStack}}
-
 I also work efficiently with AI-assisted development tools such as ChatGPT, GitHub Copilot, and Cursor to improve productivity, debug issues, optimize code, and speed up development while maintaining clean and maintainable code quality.
 
 I have attached my resume for your review. I would be grateful for the opportunity to discuss how my skills and experience can contribute to your team's success.

@@ -32,34 +32,33 @@ const resumePath = path.resolve(
   process.env.RESUME_PATH || "/Users/sambhu/Downloads/Sambhu Baburaj .pdf",
 );
 const defaultSubject =
-  process.env.DEFAULT_SUBJECT || "Application for Frontend Developer Position";
+  process.env.DEFAULT_SUBJECT || "Application for Frontend Developer Position - 3 Years Experience";
 const sendDelayMs = Number.parseInt(process.env.SEND_DELAY_MS || "1500", 10);
-const highlightedStack = "Redux | PostgreSQL | Prisma | MongoDB | GraphQL | TanStack";
 
 const ROLE_PROFILES = {
   front: {
-    title: "Frontend Developer",
-    label: "Frontend Developer Application",
-    subject: "Application for Frontend Developer Position",
+    title: "Frontend Developer - 3 Years Experience",
+    label: "Frontend Developer Application - 3 Years Experience",
+    subject: "Application for Frontend Developer Position - 3 Years Experience",
     skills: "React.js | Next.js | Redux | TanStack | GraphQL | Tailwind CSS",
     focus:
-      "With over two years of hands-on experience developing scalable and responsive web applications using React.js, Next.js, Redux, Tailwind CSS, TanStack, and GraphQL, I have built strong expertise in crafting clean, high-performance user interfaces.",
+      "With 3 years of hands-on experience developing scalable and responsive web applications using React.js, Next.js, Redux, Tailwind CSS, TanStack, and GraphQL, I have built strong expertise in crafting clean, high-performance user interfaces.",
   },
   back: {
-    title: "Backend Developer",
-    label: "Backend Developer Application",
-    subject: "Application for Backend Developer Position",
+    title: "Backend Developer - 3 Years Experience",
+    label: "Backend Developer Application - 3 Years Experience",
+    subject: "Application for Backend Developer Position - 3 Years Experience",
     skills: "Node.js | GraphQL | PostgreSQL | Prisma | MongoDB | API Development",
     focus:
-      "My experience building production web applications has given me a strong practical understanding of API-driven development, GraphQL integration, PostgreSQL and MongoDB data flows, Prisma-backed application logic, and maintainable backend workflows.",
+      "With 3 years of experience building production web applications, I have gained a strong practical understanding of API-driven development, GraphQL integration, PostgreSQL and MongoDB data flows, Prisma-backed application logic, and maintainable backend workflows.",
   },
   full: {
-    title: "Full Stack Developer",
-    label: "Full Stack Developer Application",
-    subject: "Application for Full Stack Developer Position",
+    title: "Full Stack Developer - 3 Years Experience",
+    label: "Full Stack Developer Application - 3 Years Experience",
+    subject: "Application for Full Stack Developer Position - 3 Years Experience",
     skills: "React.js | Next.js | Redux | PostgreSQL | Prisma | MongoDB | GraphQL",
     focus:
-      "With over two years of hands-on experience building modern web applications, I can contribute across the full application flow, from responsive React and Next.js interfaces with Redux and TanStack to API integration, GraphQL, Prisma, PostgreSQL, MongoDB, and performance-focused delivery.",
+      "With 3 years of hands-on experience building modern web applications, I can contribute across the full application flow, from responsive React and Next.js interfaces with Redux and TanStack to API integration, GraphQL, Prisma, PostgreSQL, MongoDB, and performance-focused delivery.",
   },
 };
 
@@ -263,7 +262,6 @@ function buildMail({ recipient, htmlTemplate, textTemplate }) {
     roleTitle: recipient.role.title,
     applicationLabel: recipient.role.label,
     skillsLine: recipient.role.skills,
-    highlightedStack,
     roleFocusParagraph: recipient.role.focus,
   };
 
