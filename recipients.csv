@@ -1,10 +1,5 @@
 enabled,companyName,email,role,subject
-true,Reflections Info Systems (P) Ltd,Careers@reflectionsinfos.com,full,
-true,Enfin Technologies India (P) Ltd,hr@enfintechnologies.com,full,Fullstack Developer
-true,Lean Transitions Solutions,careers@ltslean.com,full,Full Stack Developer - NodeJS & ReactJS
-true,Movytech Innovations (P) Ltd,hr@movytech.co,front,
-true,Mantra IT Solutions,hr@mantraitsolutions.in,full,Application for Full Stack Developer – Kochi
-true,Ynot Infosolutions,hr@ynotinfo.com,back,Laravel Developer Application
-true,Techversant Infotech Pvt Ltd,careers@techversantinfotech.com,back,
-true,Global Infonet Inc,hr@global-infonet.com,full,
-true,TouchWorld Technology,hrteam@touchworldtechnology.com,full,
+true,Empay Software Solutions Private Limited,hr@empaysoft.com,front,Application for React JS Developer
+true,Gapblue Software Labs Pvt Ltd,raju.gangadharan@gapblue.com,front,Application for Frontend Developer (React.js)
+true,Simelabs - An Astek Company,hr@simelabs.com,front,Application for Frontend Software Engineer - Payments Platform
+true,Fakeeh Technologies (P) Ltd,careers@fakeeh.tech,full,Application for Full Stack Developer

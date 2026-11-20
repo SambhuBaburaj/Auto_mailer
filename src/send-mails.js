@@ -29,7 +29,8 @@ const recipientsPath = path.resolve(ROOT_DIR, options.recipients || "recipients.
 const htmlTemplatePath = path.join(ROOT_DIR, "templates", "application-email.html");
 const textTemplatePath = path.join(ROOT_DIR, "templates", "application-email.txt");
 const resumePath = path.resolve(
-  process.env.RESUME_PATH || "/Users/sambhu/Downloads/Sambhu Baburaj .pdf",
+  ROOT_DIR,
+  process.env.RESUME_PATH || "Sambhu Baburaj.pdf",
 );
 const defaultSubject =
   process.env.DEFAULT_SUBJECT || "Application for Frontend Developer Position - 3 Years Experience";
