@@ -1,0 +1,21 @@
+Hello,
+
+I hope you are having a productive week.
+
+I am briefly following up on the job application I submitted earlier regarding the {{roleTitle}} opening at {{companyName}}.
+
+{{followupFocusParagraph}}
+
+I also work efficiently with modern AI-assisted engineering workflows (including Claude, Codex, and Cursor) to accelerate delivery, troubleshoot complex logic, and maintain clean, scalable architectures.
+
+I remain very enthusiastic about the chance to contribute to {{companyName}} and have re-attached my resume for your convenient reference. I would appreciate the opportunity for a brief conversation whenever suits your schedule.
+
+Thank you very much for your time and continued consideration.
+
+Best regards,
+Sambhu Baburaj
+Phone: +91 9746369882
+Email: sambhubaburaj513@gmail.com
+
+GitHub: https://github.com/SambhuBaburaj
+LinkedIn: https://www.linkedin.com/in/sambhu-baburaj/

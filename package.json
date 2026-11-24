@@ -7,7 +7,21 @@
   "scripts": {
     "dry-run": "node src/send-mails.js --dry-run",
     "send": "node src/send-mails.js --send",
-    "start": "node src/send-mails.js --dry-run"
+    "start": "node src/send-mails.js --dry-run",
+    "technopark": "node src/technopark-mailer.js --dry-run",
+    "technopark:open": "node src/technopark-mailer.js --dry-run --open",
+    "technopark:send": "node src/technopark-mailer.js --send",
+    "technopark:sync": "node src/technopark-mailer.js --dry-run --sync-csv",
+    "infopark": "node src/infopark-mailer.js --dry-run",
+    "infopark:open": "node src/infopark-mailer.js --dry-run --open",
+    "infopark:send": "node src/infopark-mailer.js --send",
+    "infopark:sync": "node src/infopark-mailer.js --dry-run --sync-csv",
+    "scan:all": "node src/scan-all-parks.js --dry-run",
+    "send:all": "node src/scan-all-parks.js --send",
+    "sync:all": "node src/scan-all-parks.js --dry-run --sync-csv",
+    "followup": "node src/followup-mailer.js --dry-run",
+    "followup:simulate": "node src/followup-mailer.js --dry-run --simulate-days=10",
+    "followup:send": "node src/followup-mailer.js --send"
   },
   "dependencies": {
     "dotenv": "^16.4.7",

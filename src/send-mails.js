@@ -3,6 +3,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
+import {
+  ROLE_PROFILES,
+  checkEmailStatus,
+  recordSent,
+} from "./mail-history.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,6 +19,7 @@ const args = new Set(process.argv.slice(2));
 const isSendMode = args.has("--send");
 const explicitDryRun = args.has("--dry-run");
 const dryRun = explicitDryRun || !isSendMode;
+const forceSend = args.has("--force");
 
 const options = Object.fromEntries(
   process.argv
@@ -25,45 +31,22 @@ const options = Object.fromEntries(
     }),
 );
 
+const simulateDays = Number.parseFloat(options["simulate-days"] || "0");
 const recipientsPath = path.resolve(ROOT_DIR, options.recipients || "recipients.csv");
 const htmlTemplatePath = path.join(ROOT_DIR, "templates", "application-email.html");
 const textTemplatePath = path.join(ROOT_DIR, "templates", "application-email.txt");
+const followupHtmlTemplatePath = path.join(ROOT_DIR, "templates", "followup-email.html");
+const followupTextTemplatePath = path.join(ROOT_DIR, "templates", "followup-email.txt");
 const resumePath = path.resolve(
-  process.env.RESUME_PATH || "/Users/sambhu/Downloads/Sambhu Baburaj .pdf",
+  ROOT_DIR,
+  process.env.RESUME_PATH || "Sambhu Baburaj.pdf",
 );
 const defaultSubject =
   process.env.DEFAULT_SUBJECT || "Application for Frontend Developer Position - 3 Years Experience";
 const sendDelayMs = Number.parseInt(process.env.SEND_DELAY_MS || "1500", 10);
 
-const ROLE_PROFILES = {
-  front: {
-    title: "Frontend Developer - 3 Years Experience",
-    label: "Frontend Developer Application - 3 Years Experience",
-    subject: "Application for Frontend Developer Position - 3 Years Experience",
-    skills: "React.js | Next.js | Redux | TanStack | GraphQL | Tailwind CSS",
-    focus:
-      "With 3 years of hands-on experience developing scalable and responsive web applications using React.js, Next.js, Redux, Tailwind CSS, TanStack, and GraphQL, I have built strong expertise in crafting clean, high-performance user interfaces.",
-  },
-  back: {
-    title: "Backend Developer - 3 Years Experience",
-    label: "Backend Developer Application - 3 Years Experience",
-    subject: "Application for Backend Developer Position - 3 Years Experience",
-    skills: "Node.js | GraphQL | PostgreSQL | Prisma | MongoDB | API Development",
-    focus:
-      "With 3 years of experience building production web applications, I have gained a strong practical understanding of API-driven development, GraphQL integration, PostgreSQL and MongoDB data flows, Prisma-backed application logic, and maintainable backend workflows.",
-  },
-  full: {
-    title: "Full Stack Developer - 3 Years Experience",
-    label: "Full Stack Developer Application - 3 Years Experience",
-    subject: "Application for Full Stack Developer Position - 3 Years Experience",
-    skills: "React.js | Next.js | Redux | PostgreSQL | Prisma | MongoDB | GraphQL",
-    focus:
-      "With 3 years of hands-on experience building modern web applications, I can contribute across the full application flow, from responsive React and Next.js interfaces with Redux and TanStack to API integration, GraphQL, Prisma, PostgreSQL, MongoDB, and performance-focused delivery.",
-  },
-};
-
 main().catch((error) => {
-  console.error(`\nFailed: ${error.message}`);
+  console.error(`\n❌ Failed: ${error.message}`);
   process.exitCode = 1;
 });
 
@@ -71,6 +54,8 @@ async function main() {
   assertFileExists(recipientsPath, "Recipients CSV");
   assertFileExists(htmlTemplatePath, "HTML template");
   assertFileExists(textTemplatePath, "Text template");
+  assertFileExists(followupHtmlTemplatePath, "Follow-up HTML template");
+  assertFileExists(followupTextTemplatePath, "Follow-up text template");
   assertFileExists(resumePath, "Resume PDF");
 
   const recipients = readRecipients(recipientsPath);
@@ -96,9 +81,14 @@ async function main() {
   const selectedRecipients = applyCliFilters(recipientsForThisRun);
   const htmlTemplate = fs.readFileSync(htmlTemplatePath, "utf8");
   const textTemplate = fs.readFileSync(textTemplatePath, "utf8");
+  const followupHtmlTemplate = fs.readFileSync(followupHtmlTemplatePath, "utf8");
+  const followupTextTemplate = fs.readFileSync(followupTextTemplatePath, "utf8");
 
   if (dryRun) {
-    console.log("\nDry run only. No emails will be sent.");
+    console.log("\n==========================================================");
+    console.log("   ✉️  RECIPIENTS CSV MAILER (DRY RUN)");
+    console.log("==========================================================");
+    console.log("Dry run only. No emails will be sent.");
     console.log("Use npm run send to send real emails after checking the preview.\n");
   } else {
     validateSmtpConfig();
@@ -109,24 +99,56 @@ async function main() {
   if (transporter) {
     console.log("Checking SMTP connection...");
     await transporter.verify();
-    console.log("SMTP connection verified.\n");
+    console.log("✅ SMTP connection verified.\n");
   }
 
+  let sentCount = 0;
+  let skippedCount = 0;
+
   for (const [index, recipient] of selectedRecipients.entries()) {
+    let isFollowUp = false;
+    let daysPassed = 0;
+
+    if (!forceSend) {
+      const historyStatus = checkEmailStatus(recipient.email, simulateDays);
+      if (historyStatus.shouldSkip) {
+        skippedCount++;
+        console.log(`\n[${index + 1}/${selectedRecipients.length}] ⏭️  Skipping ${recipient.email}:`);
+        console.log(`   ${historyStatus.reason}`);
+        continue;
+      }
+      isFollowUp = historyStatus.isFollowUpEligible;
+      daysPassed = historyStatus.daysPassed;
+    }
+
+    const typeLabel = isFollowUp ? "🔄 FOLLOW-UP (10+ days)" : "✉️  INITIAL APPLICATION";
     const mail = buildMail({
       recipient,
+      isFollowUp,
       htmlTemplate,
       textTemplate,
+      followupHtmlTemplate,
+      followupTextTemplate,
     });
 
     if (dryRun) {
-      printPreview(index + 1, selectedRecipients.length, mail, recipient);
+      printPreview(index + 1, selectedRecipients.length, mail, recipient, isFollowUp, daysPassed);
       continue;
     }
 
-    console.log(`Sending ${index + 1}/${selectedRecipients.length}: ${recipient.email}`);
+    console.log(`\nSending ${index + 1}/${selectedRecipients.length} [${typeLabel}]: ${recipient.email}`);
     const info = await transporter.sendMail(mail);
-    console.log(`Sent: ${info.messageId}`);
+    console.log(`✅ Sent! Message ID: ${info.messageId}`);
+    sentCount++;
+
+    recordSent({
+      email: recipient.email,
+      companyName: recipient.companyName,
+      jobTitle: recipient.subject,
+      role: recipient.roleKey,
+      source: "CSV",
+      isFollowUp,
+    });
 
     const hasMoreRecipients = index < selectedRecipients.length - 1;
     if (hasMoreRecipients && sendDelayMs > 0) {
@@ -138,7 +160,9 @@ async function main() {
     transporter.close();
   }
 
-  console.log(dryRun ? "\nDry run complete." : "\nAll enabled emails sent.");
+  console.log("\n==========================================================");
+  console.log(dryRun ? "Dry run complete." : `All done! Sent: ${sentCount}, Skipped: ${skippedCount}`);
+  console.log("==========================================================");
 }
 
 function readRecipients(filePath) {
@@ -256,25 +280,33 @@ function applyCliFilters(recipients) {
   return selectedRecipients;
 }
 
-function buildMail({ recipient, htmlTemplate, textTemplate }) {
+function buildMail({ recipient, isFollowUp, htmlTemplate, textTemplate, followupHtmlTemplate, followupTextTemplate }) {
+  const role = recipient.role || ROLE_PROFILES.full;
   const templateData = {
     companyName: recipient.companyName,
     roleTitle: recipient.role.title,
     applicationLabel: recipient.role.label,
     skillsLine: recipient.role.skills,
     roleFocusParagraph: recipient.role.focus,
+    followupFocusParagraph: recipient.role.followupFocus,
   };
 
   const fromEmail = process.env.MAIL_FROM_EMAIL || process.env.SMTP_USER;
   const fromName = process.env.MAIL_FROM_NAME || "Sambhu Baburaj";
   const from = fromEmail ? `"${fromName}" <${fromEmail}>` : `"${fromName}"`;
+  const subject = isFollowUp
+    ? `Follow-up: ${recipient.subject || role.title} - Sambhu Baburaj`
+    : recipient.subject || role.subject;
+
+  const selectedHtml = isFollowUp ? followupHtmlTemplate : htmlTemplate;
+  const selectedText = isFollowUp ? followupTextTemplate : textTemplate;
 
   return {
     from,
     to: recipient.email,
-    subject: recipient.subject,
-    text: renderTemplate(textTemplate, templateData),
-    html: renderTemplate(htmlTemplate, templateData, { html: true }),
+    subject,
+    text: renderTemplate(selectedText, templateData),
+    html: renderTemplate(selectedHtml, templateData, { html: true }),
     attachments: [
       {
         filename: path.basename(resumePath),
@@ -364,17 +396,19 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function printPreview(index, total, mail, recipient) {
-  console.log(`--- Preview ${index}/${total} ---`);
-  console.log(`Enabled: ${recipient.enabled}`);
-  console.log(`Role: ${recipient.roleKey} (${recipient.role.title})`);
-  console.log(`From: ${mail.from}`);
-  console.log(`To: ${mail.to}`);
-  console.log(`Subject: ${mail.subject}`);
+function printPreview(index, total, mail, recipient, isFollowUp, daysPassed) {
+  const badge = isFollowUp
+    ? `🔄 FOLLOW-UP (${daysPassed} days since initial application)`
+    : "✉️  INITIAL APPLICATION";
+  console.log(`\n--- Preview ${index}/${total} [${badge}] ---`);
+  console.log(`Enabled:    ${recipient.enabled}`);
+  console.log(`Role:       ${recipient.roleKey} (${recipient.role.title})`);
+  console.log(`From:       ${mail.from}`);
+  console.log(`To:         ${mail.to}`);
+  console.log(`Subject:    ${mail.subject}`);
   console.log(`Attachment: ${mail.attachments[0].path}`);
-  console.log("\nText body:");
-  console.log(mail.text);
-  console.log("");
+  console.log("\nText body preview:");
+  console.log(mail.text.slice(0, 350) + "...\n");
 }
 
 function sleep(milliseconds) {
